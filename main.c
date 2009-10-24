@@ -5,6 +5,8 @@
 #include "util.h"
 
 void test_reader_symbols();
+void test_reader_numbers();
+void test_reader_lists();
 void test_reader();
 void test_list();
 
@@ -15,26 +17,34 @@ int main(int argc, char *args[]){
 }
 
 void test_reader(){
-  LispObject number, list;
   test_reader_symbols();
-
-  lisp_read("1234", &number);
-  ASSERT(strcmp(lisp_typeof(&number),"NUMBER") == 0, "'1234' is a number");
-
-  lisp_read("(+ 1 2)", &list);
-  ASSERT(strcmp(lisp_typeof(&list), "LIST") == 0, "'(+ 1 2)' is a list");
+  test_reader_numbers();
+  test_reader_lists();
 }
 
 void test_reader_symbols(){
   LispObject symbol;
+  memset(&symbol, 0, sizeof(symbol));
   lisp_read("foo", &symbol);
   ASSERT(symbol.type == SYMBOL, "foo is a symbol");
 
+  memset(&symbol, 0, sizeof(symbol));
   lisp_read("FOO", &symbol);
   ASSERT(symbol.type == SYMBOL, "FOO is a symbol");
-  
+
+  memset(&symbol, 0, sizeof(symbol));
   lisp_read("+-/", &symbol);
   ASSERT(symbol.type == SYMBOL, "+-/ is a symbol");
+
+  memset(&symbol, 0, sizeof(symbol));
+  lisp_read("  foo  ", &symbol);
+  ASSERT(symbol.type == SYMBOL, "padded foo is a symbol");
+}
+
+void test_reader_numbers() {
+}
+
+void test_reader_lists() {
 }
 
 void test_list(){

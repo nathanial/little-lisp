@@ -14,4 +14,3 @@ typedef struct lisp_obj {
 } LispObject;
 
 void lisp_read(char *text, LispObject *result);
-char *lisp_typeof(LispObject *obj);  

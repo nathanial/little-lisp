@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "reader.h"
+#include "util.h"
+
+%%{
+	machine lisp;
+
+	symbol = (alpha|[+-/])+;
+
+	number = digit+;
+	
+	list = '(' any* ')';
+
+	main := |*
+	     ' ';
+	     symbol => { result->type = SYMBOL; printf("matched symbol '%s'\n", ts); };
+	     number => { result->type = NUMBER; printf("matched number '%s'\n", ts); };
+	     list => { result->type = LIST; printf("list '%s'\n", ts); };
+	*|;
+}%%
+
+%%write data;
+
+void lisp_read(char *text, LispObject *result){
+    int cs,act;
+    char *ts, *te;
+    char *p = text;
+    char *pe = p + strlen(p);
+    char *eof = pe;
+    %%write init;
+    %%write exec;
+}    
+	
