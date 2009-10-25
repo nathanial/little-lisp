@@ -1,8 +1,8 @@
 typedef enum {
-  LIST,
-  STRING,
-  NUMBER,
-  SYMBOL
+  LISP_SEXP,
+  LISP_STRING,
+  LISP_NUMBER,
+  LISP_SYMBOL
 } LispType;  
 
 typedef struct lisp_obj {

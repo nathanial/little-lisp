@@ -1,62 +1,37 @@
 #include <stdio.h>
 #include <string.h>
-#include "reader.h"
-#include "list.h"
+#include "scanner.h"
 #include "util.h"
+#include "token.h"
+#include <gdsl.h>
 
-void test_reader_symbols();
-void test_reader_numbers();
-void test_reader_lists();
-void test_reader();
-void test_list();
+void test_scanner();
+void test_scan_symbols();
 
 int main(int argc, char *args[]){
-  test_list();
-  test_reader();
+  test_scanner();
   return 0;
 }
 
-void test_reader(){
-  test_reader_symbols();
-  test_reader_numbers();
-  test_reader_lists();
+void test_scanner(){
+  test_scan_symbols();
 }
 
-void test_reader_symbols(){
-  LispObject symbol;
-  memset(&symbol, 0, sizeof(symbol));
-  lisp_read("foo", &symbol);
-  ASSERT(symbol.type == SYMBOL, "foo is a symbol");
-
-  memset(&symbol, 0, sizeof(symbol));
-  lisp_read("FOO", &symbol);
-  ASSERT(symbol.type == SYMBOL, "FOO is a symbol");
-
-  memset(&symbol, 0, sizeof(symbol));
-  lisp_read("+-/", &symbol);
-  ASSERT(symbol.type == SYMBOL, "+-/ is a symbol");
-
-  memset(&symbol, 0, sizeof(symbol));
-  lisp_read("  foo  ", &symbol);
-  ASSERT(symbol.type == SYMBOL, "padded foo is a symbol");
-}
-
-void test_reader_numbers() {
-}
-
-void test_reader_lists() {
-}
-
-void test_list(){
-  int count = 0;
-  void list_counter(void *data){
-    count += 1;
+void test_scan_symbols() {
+  char *text = "123 foo (+ 1 2)";
+  gdsl_list_t tokens = lisp_scan(text);
+  gdsl_list_cursor_t cursor = gdsl_list_cursor_alloc(tokens);
+  gdsl_list_cursor_move_to_head(cursor);
+  while(1){
+    Token *token = (Token*)gdsl_list_cursor_get_content(cursor);
+    printf("token %s = %s\n", token_type_string(token), token->value);
+    if(!gdsl_list_cursor_has_succ(cursor)){
+	break;
+    }
+    gdsl_list_cursor_step_forward(cursor);
   }
-  ListNode *node = list_prepend(NULL, "1");
-  node = list_prepend(node, "2");
-  node = list_prepend(node, "3");
-  node = list_prepend(node, "4");
-  list_foreach(node, list_counter);
-  ASSERT(count == 4, "list length = 4");
+  gdsl_list_cursor_free(cursor);
+  gdsl_list_free(tokens);
 }
+  
   

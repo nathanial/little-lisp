@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "scanner.h"
+#include "util.h"
+#include <gdsl.h>
+#include "token.h"
+
+
+%%{
+	machine lisp;
+
+	action add_symbol {
+	       char s[100];
+	       int len = te - ts;
+	       strncpy(s,ts,len);
+	       s[len] = '\0';
+	       gdsl_list_insert_tail(tokens, token_create(TOK_SYMBOL, s));	
+	}	       
+	action add_number {
+	       char s[100];
+	       int len = te - ts;
+	       strncpy(s,ts,len);
+	       s[len] = '\0';
+	       gdsl_list_insert_tail(tokens, token_create(TOK_NUMBER, s));
+	}
+	action add_lparen {
+	       gdsl_list_insert_tail(tokens, token_create(TOK_LPAREN, "("));
+        }
+	action add_rparen {
+	       gdsl_list_insert_tail(tokens, token_create(TOK_RPAREN, ")"));
+        }
+
+	symbol = (alpha|[+-/])+;
+
+	number = digit+;
+
+	main := |*
+	     ' ';
+	     symbol => add_symbol;
+	     number => add_number;
+	     '(' => add_lparen;
+	     ')' => add_rparen;
+	*|;
+}%%
+
+%%write data;
+
+gdsl_list_t lisp_scan(char *text){
+     gdsl_list_t tokens = gdsl_list_alloc("Tokens", NULL, NULL);
+     char *p = text;
+     char *pe = p + strlen(text);
+     char *ts, *te;
+     int cs, act;
+     char *eof = te;
+     %% write init;
+     %% write exec;
+     return tokens;
+}    
